@@ -1,19 +1,28 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+.boards {
+  display: flex;
+  gap: 3rem;
 }
 
-body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, 30px);
+  grid-template-rows: repeat(10, 30px);
+  gap: 2px;
 }
 
-dialog {
-  border: none;
-  border-radius: 8px;
-  padding: 2rem;
+.cell {
+  background-color: #a8d5e8;
+  border-radius: 2px;
 }
 
-dialog::backdrop {
-  background: rgb(0 0 0 / 50%);
+.cell.ship {
+  background-color: #475569;
+}
+
+.cell.hit {
+  background-color: #dc2626;
+}
+
+.cell.miss {
+  background-color: #e2e8f0;
 }
