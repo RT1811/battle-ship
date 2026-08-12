@@ -20,20 +20,20 @@ class Gameboard {
     }
 
     placeShip(length, [x,y], orientation) {
-        const ship = new Ship(length);
-        if (orientation == "horizontal") {
-            for(let i = y; i < y + length; i++) {
-                this.board[x][i].ship = ship;
-            }
+        const coordinates = this.getShipCoordinates(length, [x, y], orientation);
 
-        } else {
-            for(let i = x; i < x + length; i++) {
-                this.board[i][y].ship = ship;
-            }
+        if (!this.isValidPlacement(coordinates)) {
+            return null;
+        }
+
+        const ship = new Ship(length);
+
+        for (const [cx, cy] of coordinates) {
+            this.board[cx][cy].ship = ship;
         }
 
         this.ships.push(ship);
-        return ship;        
+        return ship;       
     }
 
     receiveAttack([x,y]) {
@@ -61,6 +61,29 @@ class Gameboard {
 
     getMissedAttacks() {
         return this.missedAttacks;
+    }
+
+    getShipCoordinates(length, [x, y], orientation) {
+        const coordinates = [];
+
+        for (let i = 0; i < length; i++) {
+            if (orientation === "horizontal") {
+                coordinates.push([x, y + i]);
+            } else {
+                coordinates.push([x + i, y]);
+            }
+        }
+
+        return coordinates;
+    }
+
+    isValidPlacement(coordinates) {
+        return coordinates.every(([cx, cy]) => {
+            const onBoard = cx >= 0 && cx < 10 && cy >= 0 && cy < 10;
+            if (!onBoard) return false;
+
+            return this.board[cx][cy].ship === null;
+        });
     }
 
 }
