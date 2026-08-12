@@ -1,6 +1,9 @@
 import { renderBoard } from "./render.js";
+import { showPassScreen } from "./passScreen.js";
 
-function initGame(human, computer) {
+function initGame(mode, players) {
+    let turnIndex = 0;
+
     const enemyBoardEl = document.querySelector('#enemy-board');
     const statusEl = document.querySelector('#status');
 
@@ -8,44 +11,45 @@ function initGame(human, computer) {
         statusEl.textContent = message;
     }
 
-    function handlePlayerAttack(x, y) {
-        const result = computer.gameboard.receiveAttack([x, y]);
+    function attacker() { return players[turnIndex]; }
+    function defender() { return players[1 - turnIndex]; }
 
-        if (result === null) {
-            return; // already attacked this cell
-        }
-
-        renderBoard(computer.gameboard, 'enemy-board', true);
-
-        if (computer.gameboard.allShipsSunk()) {
-            updateStatus("You win!");
-            return;
-        }
-
-        updateStatus("Computer's turn...");
-        computerTurn();
+    function renderCurrentTurn() {
+        renderBoard(attacker().gameboard, 'player-board', false);
+        renderBoard(defender().gameboard, 'enemy-board', true);
+        updateStatus(`${attacker().type === 'human' ? "Your" : "Computer's"} turn`);
     }
 
-    function computerTurn() {
-        computer.randomAttack(human.gameboard);
-        renderBoard(human.gameboard, 'player-board', false);
+    function handleAttack(x, y) {
+        const result = defender().gameboard.receiveAttack([x, y]);
+        if (result === null) return;
 
-        if (human.gameboard.allShipsSunk()) {
-            updateStatus("Computer wins!");
+        renderBoard(defender().gameboard, 'enemy-board', true);
+
+        if (defender().gameboard.allShipsSunk()) {
+            updateStatus(`${attacker().type === 'human' ? 'You win' : 'Computer wins'}!`);
             return;
         }
 
-        updateStatus("Your turn - attack the enemy board");
+        turnIndex = 1 - turnIndex;
+
+        if (attacker().type === 'computer') {
+            attacker().randomAttack(defender().gameboard);
+            renderCurrentTurn();
+        } else if (mode === 'pvp') {
+            showPassScreen(`Pass to the other player, then click Ready`, renderCurrentTurn);
+        } else {
+            renderCurrentTurn();
+        }
     }
 
     enemyBoardEl.addEventListener('click', (e) => {
         const cell = e.target.closest('.cell');
         if (!cell) return;
-        handlePlayerAttack(Number(cell.dataset.x), Number(cell.dataset.y));
+        handleAttack(Number(cell.dataset.x), Number(cell.dataset.y));
     });
 
-    updateStatus("Your turn - attack the enemy board");
-
+    renderCurrentTurn();
 }
 
-export { initGame } ;
+export { initGame };

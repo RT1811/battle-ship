@@ -9,6 +9,12 @@
   <h1>Battleship</h1>
   <p id="status"></p>
 
+  <div id="mode-select">
+    <h2>Choose Game Mode</h2>
+    <button type="button" id="vs-computer-btn">vs Computer</button>
+    <button type="button" id="vs-human-btn">vs Human</button>
+  </div>
+
   <div id="setup-phase">
     <h2>Place Your Ships</h2>
     <div id="ship-tray">
@@ -21,6 +27,11 @@
     <button type="button" id="rotate-btn">Rotate: Horizontal</button>
     <div id="setup-board" class="board"></div>
     <button type="button" id="start-game-btn" disabled>Start Game</button>
+  </div>
+
+  <div id="pass-screen" class="hidden">
+    <p id="pass-message"></p>
+    <button type="button" id="ready-btn">I'm Ready</button>
   </div>
 
   <div id="game-phase" class="boards hidden">
