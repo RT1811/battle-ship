@@ -7,6 +7,7 @@ import { showPassScreen } from "./passScreen.js";
 let gameMode = null;
 const human1 = new Player("human");
 let player2;
+let cleanupDragAndDrop = null;
 
 document.querySelector('#vs-computer-btn').addEventListener('click', () => {
     gameMode = 'pvc';
@@ -67,9 +68,15 @@ function startSetupPhase(player1, humanPlayer2, computerPlayer) {
 }
 
 function runSetupFor(player, onAllShipsPlaced) {
+    if (cleanupDragAndDrop !== null) {
+        cleanupDragAndDrop();
+    }
+
     resetShipTray();
     renderSetupBoard(player.gameboard);
-    setupDragAndDrop(player, onAllShipsPlaced);
+
+    cleanupDragAndDrop =
+        setupDragAndDrop(player, onAllShipsPlaced);
 }
 
 function resetShipTray() {

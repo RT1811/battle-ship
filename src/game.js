@@ -22,12 +22,15 @@ function initGame(mode, players) {
 
     function handleAttack(x, y) {
         const result = defender().gameboard.receiveAttack([x, y]);
+
         if (result === null) return;
 
         renderBoard(defender().gameboard, 'enemy-board', true);
 
         if (defender().gameboard.allShipsSunk()) {
-            updateStatus(`${attacker().type === 'human' ? 'You win' : 'Computer wins'}!`);
+            updateStatus(
+                `${attacker().type === 'human' ? 'You win' : 'Computer wins'}!`
+            );
             return;
         }
 
@@ -35,9 +38,22 @@ function initGame(mode, players) {
 
         if (attacker().type === 'computer') {
             attacker().randomAttack(defender().gameboard);
+
+            if (defender().gameboard.allShipsSunk()) {
+                renderBoard(defender().gameboard, 'player-board', false);
+                updateStatus('Computer wins!');
+                return;
+            }
+
+            // Switch back to the human after computer attacks
+            turnIndex = 1 - turnIndex;
+
             renderCurrentTurn();
         } else if (mode === 'pvp') {
-            showPassScreen(`Pass to the other player, then click Ready`, renderCurrentTurn);
+            showPassScreen(
+                'Pass to the other player, then click Ready',
+                renderCurrentTurn
+            );
         } else {
             renderCurrentTurn();
         }

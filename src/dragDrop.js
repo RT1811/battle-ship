@@ -7,49 +7,77 @@ function setupDragAndDrop(player, onAllShipsPlaced) {
     let draggedLength = null;
     let draggedElement = null;
     let shipsPlaced = 0;
+
     const totalShips = 5;
 
-    rotateBtn.addEventListener('click', () => {
-        orientation = orientation === 'horizontal' ? 'vertical' : 'horizontal';
-        rotateBtn.textContent = `Rotate: ${orientation === 'horizontal' ? 'Horizontal' : 'Vertical'}`;
-    });
+    function handleRotate() {
+        orientation =
+            orientation === 'horizontal'
+                ? 'vertical'
+                : 'horizontal';
 
-    shipTray.addEventListener('dragstart', (e) => {
+        rotateBtn.textContent =
+            `Rotate: ${orientation === 'horizontal'
+                ? 'Horizontal'
+                : 'Vertical'}`;
+    }
+
+    function handleDragStart(e) {
         if (!e.target.classList.contains('draggable-ship')) return;
+
         draggedLength = Number(e.target.dataset.length);
         draggedElement = e.target;
-    });
+    }
 
-    setupBoard.addEventListener('dragover', (e) => {
-        e.preventDefault(); // required, or drop never fires
-    });
-
-    setupBoard.addEventListener('drop', (e) => {
+    function handleDragOver(e) {
         e.preventDefault();
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+
         const cell = e.target.closest('.cell');
+
         if (!cell || draggedLength === null) return;
 
         const x = Number(cell.dataset.x);
         const y = Number(cell.dataset.y);
 
-        const ship = player.gameboard.placeShip(draggedLength, [x, y], orientation);
+        const ship = player.gameboard.placeShip(
+            draggedLength,
+            [x, y],
+            orientation
+        );
 
         if (ship !== null) {
-        draggedElement.remove();
-        shipsPlaced++;
-        renderSetupBoard(player.gameboard);
+            draggedElement.remove();
+            shipsPlaced++;
 
-        if (shipsPlaced === totalShips) {
-            onAllShipsPlaced();
-        }
+            renderSetupBoard(player.gameboard);
+
+            if (shipsPlaced === totalShips) {
+                onAllShipsPlaced();
+            }
         }
 
         draggedLength = null;
         draggedElement = null;
-    });
     }
 
-    function renderSetupBoard(gameboard) {
+    rotateBtn.addEventListener('click', handleRotate);
+    shipTray.addEventListener('dragstart', handleDragStart);
+    setupBoard.addEventListener('dragover', handleDragOver);
+    setupBoard.addEventListener('drop', handleDrop);
+
+    return function cleanup() {
+        rotateBtn.removeEventListener('click', handleRotate);
+        shipTray.removeEventListener('dragstart', handleDragStart);
+        setupBoard.removeEventListener('dragover', handleDragOver);
+        setupBoard.removeEventListener('drop', handleDrop);
+    };
+}
+
+function renderSetupBoard(gameboard) {
     const container = document.querySelector('#setup-board');
     container.innerHTML = '';
 
