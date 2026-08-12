@@ -38,12 +38,18 @@ class Gameboard {
 
     receiveAttack([x,y]) {
         const cell = this.board[x][y];
+
+        if(cell.hit) {
+            return null;
+        }
+
+        cell.hit = true;
+
         if(cell.ship !== null) {
             cell.ship.hit();
-            cell.hit = true;
             return true;
         } else {
-            cell.hit = true;
+            
             this.missedAttacks.push([x,y]);
             return false;
         }
